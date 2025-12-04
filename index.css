@@ -25,3 +25,16 @@
   transform-origin: center;
 }
 
+/* Hide native cursor everywhere so only custom ink cursor shows */
+html, body, #root,
+*, *::before, *::after,
+a, button, input, textarea, select, label,
+[role="button"], [role="link"], [onclick],
+svg, img, div, span, p, h1, h2, h3, h4, h5, h6,
+ul, ol, li, table, tr, td, th,
+.cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
+.cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing {
+  cursor: none !important;
+}
+
+

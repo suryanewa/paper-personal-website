@@ -83,21 +83,14 @@ export const Section: React.FC<SectionProps> = ({
 
       // SVG Squiggly Line Drawing Animation (scroll progress effect)
       if (lineRef.current) {
-        let squigglyLineTrigger: gsap.core.Tween | null = null;
-        
         const refreshSquigglyLine = () => {
           requestAnimationFrame(() => {
-            if (lineRef.current && squigglyLineTrigger) {
-              // Recalculate length after fonts load
-              const length = lineRef.current.getTotalLength();
-              gsap.set(lineRef.current, { strokeDasharray: length, strokeDashoffset: length });
-              ScrollTrigger.refresh();
-            }
+            ScrollTrigger.refresh();
           });
         };
         
         const initSquigglyLine = () => {
-          if (!lineRef.current || squigglyLineTrigger) return; // Only initialize once
+          if (!lineRef.current) return;
           
           requestAnimationFrame(() => {
             if (!lineRef.current) return;
@@ -105,7 +98,7 @@ export const Section: React.FC<SectionProps> = ({
             const length = lineRef.current.getTotalLength();
             gsap.set(lineRef.current, { strokeDasharray: length, strokeDashoffset: length });
             
-            squigglyLineTrigger = gsap.to(lineRef.current, {
+            gsap.to(lineRef.current, {
               strokeDashoffset: 0,
               ease: "none",
               scrollTrigger: {
