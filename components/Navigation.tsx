@@ -33,11 +33,16 @@ export const Navigation: React.FC = () => {
       document.body.style.overflow = 'hidden';
       setIsMenuVisible(true);
     } else {
+      // Restore body styles
+      const savedScrollY = scrollYRef.current;
       document.body.style.position = '';
       document.body.style.top = '';
       document.body.style.width = '';
       document.body.style.overflow = '';
-      window.scrollTo(0, scrollYRef.current);
+      // Restore scroll position after a brief delay to ensure styles are applied
+      requestAnimationFrame(() => {
+        window.scrollTo(0, savedScrollY);
+      });
     }
 
     return () => {
@@ -166,10 +171,27 @@ export const Navigation: React.FC = () => {
     };
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  const scrollToSection = (id: string, closeMenu: boolean = false) => {
+    if (closeMenu) {
+      // Close menu first, then scroll after body is restored
+      setIsMenuOpen(false);
+      // Wait for body styles to be restored before scrolling
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          const element = document.getElementById(id);
+          if (element) {
+            // Get the saved scroll position and calculate offset
+            const savedScrollY = scrollYRef.current;
+            const elementTop = element.getBoundingClientRect().top + savedScrollY;
+            window.scrollTo({ top: elementTop, behavior: 'smooth' });
+          }
+        });
+      });
+    } else {
+      const element = document.getElementById(id);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
     }
   };
 
@@ -220,9 +242,15 @@ export const Navigation: React.FC = () => {
         <div 
           ref={menuRef}
           className="fixed inset-0 z-[70] bg-[#fdfbf6] flex flex-col items-center justify-center"
+          onClick={(e) => {
+            // Close menu when clicking on overlay background (not on menu items)
+            if (e.target === e.currentTarget || (e.target as HTMLElement).closest('.menu-background')) {
+              setIsMenuOpen(false);
+            }
+          }}
         >
           <div 
-            className="absolute inset-0 pointer-events-none opacity-40"
+            className="absolute inset-0 pointer-events-none opacity-40 menu-background"
             style={{
               backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'100\' height=\'100\' viewBox=\'0 0 100 100\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noise\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.8\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100\' height=\'100\' filter=\'url(%23noise)\' opacity=\'0.5\'/%3E%3C/svg%3E")',
             }}
@@ -240,14 +268,14 @@ export const Navigation: React.FC = () => {
             </div>
           </button>
           
-          <ul className="flex flex-col gap-10 items-center relative z-10">
+          <ul 
+            className="flex flex-col gap-10 items-center relative z-10"
+            onClick={(e) => e.stopPropagation()}
+          >
             {navItems.map((item, index) => (
               <li key={item.id}>
                 <button
-                  onClick={() => {
-                    scrollToSection(item.id);
-                    setIsMenuOpen(false);
-                  }}
+                  onClick={() => scrollToSection(item.id, true)}
                   className="clickable block transform hover:scale-110 transition-transform duration-300"
                 >
                   <Tape rotate={index % 2 === 0 ? 2 : -2} className="scale-125">
