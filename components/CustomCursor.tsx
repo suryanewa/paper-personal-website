@@ -63,18 +63,39 @@ export const CustomCursor: React.FC = () => {
   const hoverTarget = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
-    // Force-hide native cursor at runtime to cover any CSS load/order issues.
-    // This ensures the OS cursor never shows when the custom cursor is active.
+    // Force-hide native cursor at runtime and back it up with an injected !important rule.
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
     const prevHtmlCursor = htmlEl.style.cursor;
     const prevBodyCursor = bodyEl.style.cursor;
-    htmlEl.style.cursor = 'none';
-    bodyEl.style.cursor = 'none';
+    htmlEl.style.setProperty('cursor', 'none', 'important');
+    bodyEl.style.setProperty('cursor', 'none', 'important');
+
+    const styleEl = document.createElement('style');
+    styleEl.setAttribute('data-cursor-hide', 'true');
+    styleEl.textContent = `
+      html, body, #root,
+      *, *::before, *::after,
+      a, button, input, textarea, select, label,
+      [role="button"], [role="link"], [onclick],
+      svg, img, div, span, p, h1, h2, h3, h4, h5, h6,
+      ul, ol, li, table, tr, td, th,
+      .cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
+      .cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing {
+        cursor: none !important;
+      }
+    `;
+    document.head.appendChild(styleEl);
 
     // Check if mobile (screen width < 768px)
     const isMobile = window.innerWidth < 768;
-    if (isMobile) return;
+    if (isMobile) {
+      return () => {
+        htmlEl.style.cursor = prevHtmlCursor;
+        bodyEl.style.cursor = prevBodyCursor;
+        if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
+      };
+    }
 
     const container = containerRef.current;
     if (!container) return;
@@ -400,6 +421,7 @@ export const CustomCursor: React.FC = () => {
       // Restore previous cursor styles
       htmlEl.style.cursor = prevHtmlCursor;
       bodyEl.style.cursor = prevBodyCursor;
+      if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
 
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchmove', onTouchMove);
