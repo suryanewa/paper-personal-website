@@ -63,6 +63,15 @@ export const CustomCursor: React.FC = () => {
   const hoverTarget = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
+    // Force-hide native cursor at runtime to cover any CSS load/order issues.
+    // This ensures the OS cursor never shows when the custom cursor is active.
+    const htmlEl = document.documentElement;
+    const bodyEl = document.body;
+    const prevHtmlCursor = htmlEl.style.cursor;
+    const prevBodyCursor = bodyEl.style.cursor;
+    htmlEl.style.cursor = 'none';
+    bodyEl.style.cursor = 'none';
+
     // Check if mobile (screen width < 768px)
     const isMobile = window.innerWidth < 768;
     if (isMobile) return;
@@ -388,6 +397,10 @@ export const CustomCursor: React.FC = () => {
     window.addEventListener('touchmove', onTouchMove);
 
     return () => {
+      // Restore previous cursor styles
+      htmlEl.style.cursor = prevHtmlCursor;
+      bodyEl.style.cursor = prevBodyCursor;
+
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('touchmove', onTouchMove);
       clickables.forEach((el) => {
