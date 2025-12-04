@@ -1,4 +1,4 @@
-# Surya Newa - Paper Personal Website
+# Paper Personal Website
 
 A beautifully crafted, interactive resume website featuring a hand-drawn aesthetic with paper textures, ink animations, and custom cursor effects. Built with React, TypeScript, Tailwind CSS, and GSAP.
 
