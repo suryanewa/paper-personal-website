@@ -63,10 +63,14 @@ export const CustomCursor: React.FC = () => {
   const hoverTarget = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
-    // Transparent 1x1 PNG cursor as fallback for browsers that ignore cursor:none
-    const TRANSPARENT_CURSOR = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==) 0 0, none';
+    // Check if mobile (screen width < 768px) - don't hide cursor on mobile
+    const isMobile = window.innerWidth < 768;
+    if (isMobile) return;
+
+    // Transparent 32x32 PNG cursor (larger for better browser support)
+    const TRANSPARENT_CURSOR = 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'32\' height=\'32\' viewBox=\'0 0 32 32\'%3E%3C/svg%3E") 0 0, none';
     
-    // Force-hide native cursor at runtime and back it up with an injected !important rule.
+    // Force-hide native cursor at runtime
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
     const prevHtmlCursor = htmlEl.style.cursor;
@@ -74,46 +78,89 @@ export const CustomCursor: React.FC = () => {
     htmlEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
     bodyEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
 
-    // Inject style at end of body to ensure it loads AFTER Tailwind CDN
+    // Inject style with maximum specificity at end of body
     const styleEl = document.createElement('style');
     styleEl.setAttribute('data-cursor-hide', 'true');
     styleEl.textContent = `
-      html, body, #root,
-      *, *::before, *::after,
-      a, button, input, textarea, select, label,
+      html, html *, body, body *,
+      #root, #root *,
+      *:not([data-cursor-hide]),
+      *::before, *::after,
+      a, a *, button, button *,
+      input, textarea, select, label,
       [role="button"], [role="link"], [onclick],
-      svg, img, div, span, p, h1, h2, h3, h4, h5, h6,
+      svg, svg *, img, div, span, p,
+      h1, h2, h3, h4, h5, h6,
       ul, ol, li, table, tr, td, th,
+      nav, nav *, header, header *, footer, footer *,
       .cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
       .cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing,
-      [class*="cursor-"] {
+      [class*="cursor-"], [class*="clickable"] {
+        cursor: ${TRANSPARENT_CURSOR} !important;
+      }
+      /* Cover all interactive states */
+      *:hover, *:focus, *:active, *:focus-visible, *:focus-within,
+      a:hover, a:focus, a:active,
+      button:hover, button:focus, button:active,
+      input:hover, input:focus,
+      [role="button"]:hover, [role="button"]:focus,
+      .clickable:hover, .clickable:focus {
         cursor: ${TRANSPARENT_CURSOR} !important;
       }
     `;
-    // Append to body instead of head to ensure it's after all other styles
     document.body.appendChild(styleEl);
 
-    // Check if mobile (screen width < 768px)
-    const isMobile = window.innerWidth < 768;
-    if (isMobile) {
-      return () => {
-        htmlEl.style.cursor = prevHtmlCursor;
-        bodyEl.style.cursor = prevBodyCursor;
-        if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
-      };
-    }
+    // MutationObserver to catch any dynamically added elements or style changes
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type === 'attributes' && mutation.attributeName === 'style') {
+          const el = mutation.target as HTMLElement;
+          if (el.style.cursor && el.style.cursor !== 'none' && !el.style.cursor.includes('data:image')) {
+            el.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+          }
+        }
+        if (mutation.type === 'childList') {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof HTMLElement) {
+              node.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+              node.querySelectorAll('*').forEach((child) => {
+                (child as HTMLElement).style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+              });
+            }
+          });
+        }
+      });
+    });
+    observer.observe(document.body, {
+      attributes: true,
+      attributeFilter: ['style', 'class'],
+      childList: true,
+      subtree: true,
+    });
 
-    // Keep cursor hidden defensively in case other styles override it later.
+    // Keep cursor hidden defensively
     const enforceCursorNone = () => {
       htmlEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
       bodyEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
-      // Also re-apply to all elements with inline cursor styles
-      document.querySelectorAll('[style*="cursor"]').forEach((el) => {
+      // Apply to ALL elements
+      document.querySelectorAll('*').forEach((el) => {
         (el as HTMLElement).style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
       });
     };
+    
+    // Run immediately and on interval
     enforceCursorNone();
-    const cursorInterval = window.setInterval(enforceCursorNone, 500);
+    const cursorInterval = window.setInterval(enforceCursorNone, 1000);
+    
+    // Also enforce on mouse events
+    const onMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target && target.style) {
+        target.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+      }
+    };
+    document.addEventListener('mouseover', onMouseOver, true);
+    
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') enforceCursorNone();
     };
@@ -125,6 +172,8 @@ export const CustomCursor: React.FC = () => {
         htmlEl.style.cursor = prevHtmlCursor;
         bodyEl.style.cursor = prevBodyCursor;
         clearInterval(cursorInterval);
+        observer.disconnect();
+        document.removeEventListener('mouseover', onMouseOver, true);
         document.removeEventListener('visibilitychange', onVisibilityChange);
         if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
       };
@@ -452,6 +501,8 @@ export const CustomCursor: React.FC = () => {
       htmlEl.style.cursor = prevHtmlCursor;
       bodyEl.style.cursor = prevBodyCursor;
       clearInterval(cursorInterval);
+      observer.disconnect();
+      document.removeEventListener('mouseover', onMouseOver, true);
       document.removeEventListener('visibilitychange', onVisibilityChange);
       if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
 
