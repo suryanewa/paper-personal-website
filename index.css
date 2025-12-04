@@ -17,7 +17,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: none !important;
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3C/svg%3E") 0 0, none !important;
 }
 
 .section-icon svg {
@@ -25,15 +25,32 @@
   transform-origin: center;
 }
 
-/* Hide native cursor everywhere - we use a custom HTML/JS cursor */
-html, body, * {
-  cursor: none !important;
+/* Hide native cursor everywhere so only custom ink cursor shows */
+/* Use transparent SVG as fallback for browsers that ignore cursor:none */
+html, html *, body, body *,
+#root, #root *,
+*, *::before, *::after,
+a, a *, button, button *,
+input, textarea, select, label,
+[role="button"], [role="link"], [onclick],
+svg, svg *, img, div, span, p,
+h1, h2, h3, h4, h5, h6,
+ul, ol, li, table, tr, td, th,
+nav, nav *, header, header *, footer, footer *,
+.cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
+.cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing,
+[class*="cursor-"], [class*="clickable"] {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3C/svg%3E") 0 0, none !important;
 }
 
-/* Ensure inputs and textareas don't show I-beam cursor */
-input, textarea, [contenteditable="true"] {
-  cursor: none !important;
-  caret-color: currentColor;
+/* Cover all interactive states */
+*:hover, *:focus, *:active, *:focus-visible, *:focus-within,
+a:hover, a:focus, a:active,
+button:hover, button:focus, button:active,
+input:hover, input:focus,
+[role="button"]:hover, [role="button"]:focus,
+.clickable:hover, .clickable:focus {
+  cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3C/svg%3E") 0 0, none !important;
 }
 
 
