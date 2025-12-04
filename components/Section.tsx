@@ -89,6 +89,9 @@ export const Section: React.FC<SectionProps> = ({
           });
         };
         
+        // Track if we've already registered the load listener
+        let loadListenerRegistered = false;
+        
         const initSquigglyLine = () => {
           if (!lineRef.current) return;
           
@@ -109,10 +112,11 @@ export const Section: React.FC<SectionProps> = ({
               }
             });
             
-            // Refresh after resources load
+            // Refresh after resources load (only register once)
             if (document.readyState === 'complete') {
               refreshSquigglyLine();
-            } else {
+            } else if (!loadListenerRegistered) {
+              loadListenerRegistered = true;
               window.addEventListener('load', refreshSquigglyLine);
               loadListeners.push(() => window.removeEventListener('load', refreshSquigglyLine));
             }
@@ -120,12 +124,6 @@ export const Section: React.FC<SectionProps> = ({
         };
         
         initSquigglyLine();
-        
-        // Also refresh after fonts/resources load (but don't reinitialize)
-        if (document.readyState !== 'complete') {
-          window.addEventListener('load', refreshSquigglyLine);
-          loadListeners.push(() => window.removeEventListener('load', refreshSquigglyLine));
-        }
       }
 
       // Icon Animation: Animate in on scroll, hover animation

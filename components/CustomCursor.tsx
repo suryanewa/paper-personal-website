@@ -475,7 +475,10 @@ export const CustomCursor: React.FC = () => {
     });
 
     // Handle elements with data-blob-target attribute (hover on parent triggers blob on child)
+    // Store listeners for proper cleanup
     const blobTriggers = document.querySelectorAll('[data-blob-target]');
+    const triggerListeners: { el: Element; enter: (e: Event) => void }[] = [];
+    
     blobTriggers.forEach((el) => {
       const targetSelector = el.getAttribute('data-blob-target');
       if (!targetSelector) return;
@@ -489,6 +492,7 @@ export const CustomCursor: React.FC = () => {
         }
       };
       
+      triggerListeners.push({ el, enter: onTriggerEnter });
       el.addEventListener('mouseenter', onTriggerEnter);
       el.addEventListener('mouseleave', onMouseLeave);
     });
@@ -513,8 +517,9 @@ export const CustomCursor: React.FC = () => {
         el.removeEventListener('mouseenter', onMouseEnter);
         el.removeEventListener('mouseleave', onMouseLeave);
       });
-      blobTriggers.forEach((el) => {
-        el.removeEventListener('mouseenter', () => {});
+      // Remove blob trigger listeners using stored references
+      triggerListeners.forEach(({ el, enter }) => {
+        el.removeEventListener('mouseenter', enter);
         el.removeEventListener('mouseleave', onMouseLeave);
       });
       if (idleTimeout.current) clearTimeout(idleTimeout.current);
