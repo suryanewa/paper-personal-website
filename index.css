@@ -17,7 +17,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: none !important;
+  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==) 0 0, none !important;
 }
 
 .section-icon svg {
@@ -26,6 +26,7 @@
 }
 
 /* Hide native cursor everywhere so only custom ink cursor shows */
+/* Use transparent 1x1 PNG as fallback for browsers that ignore cursor:none */
 html, body, #root,
 *, *::before, *::after,
 a, button, input, textarea, select, label,
@@ -33,8 +34,9 @@ a, button, input, textarea, select, label,
 svg, img, div, span, p, h1, h2, h3, h4, h5, h6,
 ul, ol, li, table, tr, td, th,
 .cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
-.cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing {
-  cursor: none !important;
+.cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing,
+[class*="cursor-"] {
+  cursor: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==) 0 0, none !important;
 }
 
 

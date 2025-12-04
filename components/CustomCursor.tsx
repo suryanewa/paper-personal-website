@@ -63,14 +63,18 @@ export const CustomCursor: React.FC = () => {
   const hoverTarget = useRef<{ x: number; y: number; width: number; height: number } | null>(null);
 
   useEffect(() => {
+    // Transparent 1x1 PNG cursor as fallback for browsers that ignore cursor:none
+    const TRANSPARENT_CURSOR = 'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==) 0 0, none';
+    
     // Force-hide native cursor at runtime and back it up with an injected !important rule.
     const htmlEl = document.documentElement;
     const bodyEl = document.body;
     const prevHtmlCursor = htmlEl.style.cursor;
     const prevBodyCursor = bodyEl.style.cursor;
-    htmlEl.style.setProperty('cursor', 'none', 'important');
-    bodyEl.style.setProperty('cursor', 'none', 'important');
+    htmlEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+    bodyEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
 
+    // Inject style at end of body to ensure it loads AFTER Tailwind CDN
     const styleEl = document.createElement('style');
     styleEl.setAttribute('data-cursor-hide', 'true');
     styleEl.textContent = `
@@ -81,11 +85,13 @@ export const CustomCursor: React.FC = () => {
       svg, img, div, span, p, h1, h2, h3, h4, h5, h6,
       ul, ol, li, table, tr, td, th,
       .cursor-pointer, .cursor-default, .cursor-not-allowed, .cursor-wait,
-      .cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing {
-        cursor: none !important;
+      .cursor-move, .cursor-text, .cursor-help, .cursor-grab, .cursor-grabbing,
+      [class*="cursor-"] {
+        cursor: ${TRANSPARENT_CURSOR} !important;
       }
     `;
-    document.head.appendChild(styleEl);
+    // Append to body instead of head to ensure it's after all other styles
+    document.body.appendChild(styleEl);
 
     // Check if mobile (screen width < 768px)
     const isMobile = window.innerWidth < 768;
@@ -97,8 +103,32 @@ export const CustomCursor: React.FC = () => {
       };
     }
 
+    // Keep cursor hidden defensively in case other styles override it later.
+    const enforceCursorNone = () => {
+      htmlEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+      bodyEl.style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+      // Also re-apply to all elements with inline cursor styles
+      document.querySelectorAll('[style*="cursor"]').forEach((el) => {
+        (el as HTMLElement).style.setProperty('cursor', TRANSPARENT_CURSOR, 'important');
+      });
+    };
+    enforceCursorNone();
+    const cursorInterval = window.setInterval(enforceCursorNone, 500);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') enforceCursorNone();
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     const container = containerRef.current;
-    if (!container) return;
+    if (!container) {
+      return () => {
+        htmlEl.style.cursor = prevHtmlCursor;
+        bodyEl.style.cursor = prevBodyCursor;
+        clearInterval(cursorInterval);
+        document.removeEventListener('visibilitychange', onVisibilityChange);
+        if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
+      };
+    }
 
     // Cursor is hidden via CSS in index.html for better coverage
 
@@ -421,6 +451,8 @@ export const CustomCursor: React.FC = () => {
       // Restore previous cursor styles
       htmlEl.style.cursor = prevHtmlCursor;
       bodyEl.style.cursor = prevBodyCursor;
+      clearInterval(cursorInterval);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
       if (styleEl.parentNode) styleEl.parentNode.removeChild(styleEl);
 
       window.removeEventListener('mousemove', onMouseMove);
