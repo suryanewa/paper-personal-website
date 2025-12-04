@@ -1,0 +1,156 @@
+* {
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -ms-box-sizing: border-box;
+  -o-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+body {
+  background: #f1f1f1;
+  font-family: helvetica neue, helvetica, arial, sans-serif;
+  font-weight: 200;
+}
+
+#notebook-paper {
+  width: 960px;
+  height: 1109px;
+  background-color: white;
+  margin: 50px auto;
+  position: relative;
+  padding-top: 120px;
+  padding-left: 160px;
+  padding-right: 20px;
+  border-radius: 5px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.vertical-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 140px;
+  width: 1px;
+  background-color: #db4034;
+  z-index: 2;
+}
+
+.horizontal-lines {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-image: linear-gradient(to bottom, transparent 29px, #00b0d7 29px, #00b0d7 30px);
+  background-size: 100% 30px;
+  z-index: 1;
+}
+
+.texture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  filter: url(#paper-filter);
+  z-index: 0;
+  opacity: 0.3;
+  border-radius: 5px;
+  pointer-events: none;
+}
+
+#notebook-paper::before,
+#notebook-paper::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  bottom: 12px;
+  width: 50%;
+  height: 20%;
+  max-width: 300px;
+  max-height: 100px;
+  box-shadow: 0 5px 6px rgba(0, 0, 0, 0.3);
+  transform: rotate(0deg);
+  background: transparent;
+  transition: all 0.3s ease-in-out;
+}
+
+#notebook-paper::before {
+  left: 12px;
+  transform: rotate(-1deg);
+}
+
+#notebook-paper::after {
+  right: 12px;
+  transform: rotate(1deg);
+  left: auto;
+}
+
+#notebook-paper:hover::before,
+#notebook-paper:hover::after {
+  box-shadow: 0 25px 20px rgba(0, 0, 0, 0.6);
+  bottom: 20px;
+}
+
+#notebook-paper:hover::before {
+  transform: rotate(-6deg);
+}
+
+#notebook-paper:hover::after {
+  transform: rotate(6deg);
+}
+
+#notebook-paper header {
+  height: 120px;
+  width: 100%;
+  background: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 5px 5px 0 0;
+  z-index: 2;
+}
+#notebook-paper header h1 {
+  font-size: 60px;
+  line-height: 60px;
+  padding: 29px 20px 0 160px;
+  margin: 0;
+}
+
+#notebook-paper header .date {
+  position: absolute;
+  top: 58px;
+  right: 20px;
+  font-size: 20px;
+  line-height: 30px;
+}
+#notebook-paper #content {
+  margin-top: 0;
+  font-size: 20px;
+  line-height: 30px;
+  position: relative;
+  z-index: 3;
+}
+#notebook-paper #content p {
+  margin: 0 0 30px 0;
+}
+
+.holes {
+  position: absolute;
+  left: 40px;
+  top: 150px;
+  bottom: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 5;
+}
+
+.hole {
+  width: 40px;
+  height: 40px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  box-shadow: inset 2px 2px 5px rgba(0, 0, 0, 0.2);
+}

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <title>Ink transition effect with PNG sprite</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/webfont/1.6.26/webfont.js"></script>
+<script>
+  WebFont.load({
+    google: {
+      families: ['Roboto', 'Nanum+Gothic', 'Nanum+Pen+Script&amp;subset=korean', 'Kalam']
+    }
+  });
+</script>
+
+<script>
+(function () {var a={};var f=/iPhone/i,h=/iPod/i,i=/iPad/i,r=/\biOS-universal(?:.+)Mac\b/i,g=/\bAndroid(?:.+)Mobile\b/i,j=/Android/i,c=/(?:SD4930UR|\bSilk(?:.+)Mobile\b)/i,d=/Silk/i,b=/Windows Phone/i,k=/\bWindows(?:.+)ARM\b/i,m=/BlackBerry/i,n=/BB10/i,o=/Opera Mini/i,p=/\b(CriOS|Chrome)(?:.+)Mobile/i,q=/Mobile(?:.+)Firefox\b/i;function s(l){return function($){return $.test(l)}}function e(l){var $=(l=l||("undefined"!=typeof navigator?navigator.userAgent:"")).split("[FBAN");void 0!==$[1]&&(l=$[0]),void 0!==($=l.split("Twitter"))[1]&&(l=$[0]);var a=s(l),e={apple:{phone:a(f)&&!a(b),ipod:a(h),tablet:!a(f)&&a(i)&&!a(b),universal:a(r),device:(a(f)||a(h)||a(i))&&!a(b)},amazon:{phone:a(c),tablet:!a(c)&&a(d),device:a(c)||a(d)},android:{phone:!a(b)&&a(c)||!a(b)&&a(g),tablet:!a(b)&&!a(c)&&!a(g)&&(a(d)||a(j)),device:!a(b)&&(a(c)||a(d)||a(g)||a(j))||a(/\bokhttp\b/i)},windows:{phone:a(b),tablet:a(k),device:a(b)||a(k)},other:{blackberry:a(m),blackberry10:a(n),opera:a(o),firefox:a(q),chrome:a(p),device:a(m)||a(n)||a(o)||a(q)||a(p)},any:!1,phone:!1,tablet:!1};return e.any=e.apple.universal||e.apple.device||e.android.device||e.windows.device||e.other.device,e.phone=e.apple.phone||e.android.phone||e.windows.phone,e.tablet=e.apple.tablet||e.android.tablet||e.windows.tablet,e}a=e();if(typeof exports==="object"&&typeof module!=="undefined"){module.exports=a}else if(typeof define==="function"&&define.amd){define(function(){return a})}else{this["isMobile"]=a}})();
+
+isMobile.any || document.querySelector('html').classList.add('is-desktop');
+</script><link rel="stylesheet" href="https://public.codepenassets.com/css/normalize-5.0.0.min.css">
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/2.0.0/modern-normalize.min.css'><link rel="stylesheet" href="./style.css">
+
+  </head>
+    
+  <body>
+  <div class="o-page">
+  <div class="o-main">
+    <div class="o-container">
+      <h1 class="c-author js-liquify-trigger">
+        <div class="c-author__korean">신윤복</div>
+        <div class="c-author__english">Shin Yun-bok</div>
+      </h1>
+
+      <div class="js-ink-trigger c-transition c-transition--large c-transition--center">
+        <img class="c-transition__img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/Hyewon-Wolha-jeongin.jpg" alt="Lovers under the moon " />
+      </div>
+
+      <p class="u-korean" data-delay="1.5">혜원 신윤복 (1758-1813)은 조선시대의 화가이다.</p>
+      <p data-delay="1.7" class="u-spacing-top-small">Shin Yun-bok, better known by his pen name Hyewon (1758–1813), was a Korean painter of the Joseon Dynasty.</p>
+
+      <p class="u-korean" data-delay="2">당대의 단원 김홍도와 긍재 김득신과 같이, 그때 당시의 일상생활의 사실적 묘사로 잘 알려져 있다.</p>
+      <p data-delay="2.2" class="u-spacing-top-small">Like his contemporaries Danwon and Geungjae, he is known for his realistic depictions of daily life in his time.</p>
+      
+      <div class="js-ink-trigger c-transition c-transition--center">
+        <img class="c-transition__img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/Hyewon-Jusa.geobae.jpg" alt="Drinking bout" />
+      </div>
+      
+      <p class="u-korean" data-delay="2.5">혜원의 그림은 단원의 작품보다 성적묘사가 훨씬 강했고, 이것은 당시 왕립 미술 학교에서 파면을 당하는데 이유가 되었다.</p>
+      <p data-delay="2.7" class="u-spacing-top-small">His genre paintings are distinctly more erotic than Danwon's, a fact which contributed to his expulsion from the royal painting institute, Dohwaseo.</p>
+      
+      <div class="js-ink-trigger c-transition c-transition--center">
+        <img class="c-transition__img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/Hyewon-Dano.pungjeong.jpg" alt="Dano day" />
+      </div>
+
+      <p class="u-korean">단원, 오원과 더불어, 혜원은 현재 조선시대 "3원 화가"로 불리우고 있다.</p>
+      <p class="u-spacing-top-small">Together with Danwon and the later painter Owon, Hyewon is remembered today as one of the "Three Wons" of Joseon-period painting.</p>
+      
+      <div class="js-ink-trigger c-transition c-transition--portrait c-transition--img-top c-transition--center">
+        <img class="c-transition__img" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/Hyewon-Miindo.jpg" alt="Miindo" />
+      </div>
+      
+      <p><img class="c-stamp" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/heywon-stamp.png" alt="Hyewon stamp" /></p>
+    </div>
+  </div>
+</div>
+
+<svg style="height: 0; opacity: 0; visibility: hidden;">
+  <filter id="liquify">
+      <feTurbulence baseFrequency="0.015" numOctaves="3" result="warp" type="fractalNoise"></feTurbulence>
+      <feDisplacementMap id="liquid" in="SourceGraphic" in2="warp" scale="300" xChannelSelector="R" yChannelSelector="B"></feDisplacementMap>
+    </filter>
+</svg>
+
+<div class="c-author-ryan">
+  Built with 💜 &nbsp; by <a target="_blank" class="c-author-ryan__link" href="https://frontendly.io/?utm_source=codepen&utm_medium=link&utm_campaign=ink_transition">Frontendly</a>
+</div>
+
+<div class="c-fe30">
+    <div class="c-fe30__inner">
+      <a class="c-fe30__photo" href="https://frontendly.io/?utm_source=codepen&utm_medium=photo&utm_campaign=ink_transition" target="_blank"><img class="c-fe30__img" src="https://assets.codepen.io/204808/internal/avatars/users/default.png?format=auto&version=1718194767&width=300&height=300" alt="Ryan Yu" /></a>
+      <p>Hey 👋 &nbsp; Would you like to <strong>level up</strong> your <strong>frontend skills?</strong> 🚀</p>
+      <!--       <p>Check it out at <a href="https://frontendly.io/?utm_source=codepen&utm_medium=banner&utm_campaign=magicarea" class="c-fe30__link" target="_blank">frontendly.io</a>.</p> -->
+      <p><a href="https://www.linkedin.com/in/iamryanyu/" class="c-fe30__link" target="_blank">Follow me</a> for <strong>daily frontend tips</strong> on building beautiful, high-performing, and inclusive web.</p>
+    </div>
+  </div>
+
+<!-- <div class="c-fe30">
+  <div class="c-fe30__inner">
+    <a class="c-fe30__photo" href="https://frontendly.io/?utm_source=codepen&utm_medium=photo&utm_campaign=ink_transition" target="_blank"><img class="c-fe30__img" src="https://assets.codepen.io/204808/internal/avatars/users/default.png?format=auto&version=1718194767&width=300&height=300" alt="Ryan Yu" /></a>
+    <p>Hey 👋 &nbsp; Would you like to <strong>level up</strong> your <strong>frontend skills?</strong> 🚀</p>
+    <p>Check it out at <a href="https://frontendly.io/?utm_source=codepen&utm_medium=banner&utm_campaign=ink_transition" class="c-fe30__link" target="_blank">frontendly.io</a>.</p>
+  </div>
+</div> -->
+
+<!-- <div class="c-intro">
+  <p class="c-fe30">Learn 30 real-world front-end skills like this pen @ <a href="https://frontend30.com/?utm_source=codepen&utm_medium=link&utm_campaign=shinyunbok" target="_blank">FrontEnd30.com</a>.
+  </p>
+  <a class="c-ryanyu" href="https://frontend30.com/?utm_source=codepen&utm_medium=logo&utm_campaign=shinyunbok" target="_blank">
+    <div class="c-ryanyu__front">
+      <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/204808/ryan-yu-brand.png" alt="Ryan Yu" />
+    </div>
+    <div class="c-ryanyu__back"></div>
+  </a>
+</div> -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/gsap/2.0.2/TweenMax.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/ScrollMagic.min.js'></script>
+<script src='//cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.5/plugins/animation.gsap.js'></script><script  src="./script.js"></script>
+
+  </body>
+  
+</html>

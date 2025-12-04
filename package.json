@@ -1,0 +1,35 @@
+{
+  "name": "simple-resume",
+  "version": "1.0.0",
+  "description": "A beautifully crafted, interactive resume website featuring a hand-drawn aesthetic with paper textures, ink animations, and custom cursor effects",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "resume",
+    "portfolio",
+    "react",
+    "typescript",
+    "tailwindcss",
+    "gsap",
+    "animation"
+  ],
+  "author": "Surya Newa",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "lucide-react": "^0.555.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "gsap": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "typescript": "~5.8.2",
+    "vite": "^6.2.0"
+  }
+}
