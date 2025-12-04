@@ -31,6 +31,9 @@ export const Section: React.FC<SectionProps> = ({
   const iconRef = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
+    // Track all event listeners for cleanup
+    const loadListeners: (() => void)[] = [];
+    
     // Set SVG width to match title width exactly
     const updateLineWidth = () => {
       if (titleRef.current && lineSvgRef.current) {
@@ -39,7 +42,26 @@ export const Section: React.FC<SectionProps> = ({
       }
     };
     
-    updateLineWidth();
+    // Initial update with delay to ensure fonts are loaded
+    const initialUpdate = () => {
+      requestAnimationFrame(() => {
+        updateLineWidth();
+        // Refresh ScrollTrigger after layout is complete
+        ScrollTrigger.refresh();
+      });
+    };
+    
+    // Run immediately
+    initialUpdate();
+    
+    // Also run after fonts and resources are loaded
+    if (document.readyState === 'complete') {
+      initialUpdate();
+    } else {
+      window.addEventListener('load', initialUpdate);
+      loadListeners.push(() => window.removeEventListener('load', initialUpdate));
+    }
+    
     window.addEventListener('resize', updateLineWidth);
 
     const ctx = gsap.context(() => {
@@ -61,70 +83,150 @@ export const Section: React.FC<SectionProps> = ({
 
       // SVG Squiggly Line Drawing Animation (scroll progress effect)
       if (lineRef.current) {
-        const length = lineRef.current.getTotalLength();
-        gsap.set(lineRef.current, { strokeDasharray: length, strokeDashoffset: length });
+        let squigglyLineTrigger: gsap.core.Tween | null = null;
         
-        gsap.to(lineRef.current, {
-          strokeDashoffset: 0,
-          ease: "none",
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 80%",
-            end: "top 20%",
-            scrub: 1,
-          }
-        });
+        const refreshSquigglyLine = () => {
+          requestAnimationFrame(() => {
+            if (lineRef.current && squigglyLineTrigger) {
+              // Recalculate length after fonts load
+              const length = lineRef.current.getTotalLength();
+              gsap.set(lineRef.current, { strokeDasharray: length, strokeDashoffset: length });
+              ScrollTrigger.refresh();
+            }
+          });
+        };
+        
+        const initSquigglyLine = () => {
+          if (!lineRef.current || squigglyLineTrigger) return; // Only initialize once
+          
+          requestAnimationFrame(() => {
+            if (!lineRef.current) return;
+            
+            const length = lineRef.current.getTotalLength();
+            gsap.set(lineRef.current, { strokeDasharray: length, strokeDashoffset: length });
+            
+            squigglyLineTrigger = gsap.to(lineRef.current, {
+              strokeDashoffset: 0,
+              ease: "none",
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: "top 80%",
+                end: "top 20%",
+                scrub: 1,
+              }
+            });
+            
+            // Refresh after resources load
+            if (document.readyState === 'complete') {
+              refreshSquigglyLine();
+            } else {
+              window.addEventListener('load', refreshSquigglyLine);
+              loadListeners.push(() => window.removeEventListener('load', refreshSquigglyLine));
+            }
+          });
+        };
+        
+        initSquigglyLine();
+        
+        // Also refresh after fonts/resources load (but don't reinitialize)
+        if (document.readyState !== 'complete') {
+          window.addEventListener('load', refreshSquigglyLine);
+          loadListeners.push(() => window.removeEventListener('load', refreshSquigglyLine));
+        }
       }
 
       // Icon Animation: Animate in on scroll, hover animation
       if (iconRef.current) {
+        const calculateIconLengths = () => {
+          const svgElements = iconRef.current?.querySelectorAll('path, rect, line, circle');
+          if (!svgElements) return;
+          
+          const elementLengths: Map<SVGElement, number> = new Map();
+          
+          // Calculate and store lengths for all elements
+          svgElements.forEach((element) => {
+            let length = 1000;
+            if ('getTotalLength' in element && typeof (element as SVGPathElement).getTotalLength === 'function') {
+              length = (element as SVGPathElement).getTotalLength();
+            } else if (element instanceof SVGRectElement) {
+              // Approximate length for rect: perimeter
+              const width = element.width?.baseVal?.value || 0;
+              const height = element.height?.baseVal?.value || 0;
+              length = (width + height) * 2;
+            } else if (element instanceof SVGLineElement) {
+              // Calculate line length using distance formula
+              const x1 = element.x1?.baseVal?.value || 0;
+              const y1 = element.y1?.baseVal?.value || 0;
+              const x2 = element.x2?.baseVal?.value || 0;
+              const y2 = element.y2?.baseVal?.value || 0;
+              length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+            } else if (element instanceof SVGCircleElement) {
+              // Approximate circle circumference
+              const r = element.r?.baseVal?.value || 0;
+              length = 2 * Math.PI * r;
+            }
+            
+            elementLengths.set(element, length);
+            
+            // Initialize as hidden
+            gsap.set(element, { 
+              strokeDasharray: length, 
+              strokeDashoffset: length 
+            });
+          });
+          
+          return elementLengths;
+        };
+        
+        // Calculate lengths after a brief delay to ensure SVG is fully rendered
+        const elementLengths = new Map<SVGElement, number>();
+        const initIconLengths = () => {
+          requestAnimationFrame(() => {
+            const lengths = calculateIconLengths();
+            if (lengths) {
+              lengths.forEach((value, key) => elementLengths.set(key, value));
+            }
+          });
+        };
+        
+        initIconLengths();
+        
+        // Also recalculate after fonts/resources load
+        if (document.readyState === 'complete') {
+          initIconLengths();
+        } else {
+          window.addEventListener('load', initIconLengths);
+          loadListeners.push(() => window.removeEventListener('load', initIconLengths));
+        }
+        
         const svgElements = iconRef.current.querySelectorAll('path, rect, line, circle');
-        const elementLengths: Map<SVGElement, number> = new Map();
         let hasAnimatedIn = false;
         const iconType = iconRef.current.querySelector('svg')?.dataset.iconType;
         const animateAsGroup = iconType === 'sliders';
         
-        // Calculate and store lengths for all elements
-        svgElements.forEach((element) => {
-          let length = 1000;
-          if ('getTotalLength' in element && typeof (element as SVGPathElement).getTotalLength === 'function') {
-            length = (element as SVGPathElement).getTotalLength();
-          } else if (element instanceof SVGRectElement) {
-            // Approximate length for rect: perimeter
-            const width = element.width?.baseVal?.value || 0;
-            const height = element.height?.baseVal?.value || 0;
-            length = (width + height) * 2;
-          } else if (element instanceof SVGLineElement) {
-            // Calculate line length using distance formula
-            const x1 = element.x1?.baseVal?.value || 0;
-            const y1 = element.y1?.baseVal?.value || 0;
-            const x2 = element.x2?.baseVal?.value || 0;
-            const y2 = element.y2?.baseVal?.value || 0;
-            length = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
-          } else if (element instanceof SVGCircleElement) {
-            // Approximate circle circumference
-            const r = element.r?.baseVal?.value || 0;
-            length = 2 * Math.PI * r;
-          }
-          
-          elementLengths.set(element, length);
-          
-          // Initialize as hidden
-          gsap.set(element, { 
-            strokeDasharray: length, 
-            strokeDashoffset: length 
-          });
-        });
-        
         // Scroll-triggered animation: animate in once when section comes into view.
         // Use a more forgiving start so it also triggers for sections near the bottom
         // like Publications and Skills on shorter viewports.
-        ScrollTrigger.create({
+        const scrollTrigger = ScrollTrigger.create({
           trigger: sectionRef.current,
           start: "top 95%", // when section top is near bottom of viewport
           onEnter: () => {
             if (!hasAnimatedIn) {
               hasAnimatedIn = true;
+              // Recalculate lengths before animating to ensure accuracy
+              const lengths = calculateIconLengths();
+              if (lengths) {
+                lengths.forEach((value, key) => elementLengths.set(key, value));
+                // Re-initialize with correct lengths
+                svgElements.forEach((element) => {
+                  const length = elementLengths.get(element) || 1000;
+                  gsap.set(element, { 
+                    strokeDasharray: length, 
+                    strokeDashoffset: length 
+                  });
+                });
+              }
+              
               if (animateAsGroup) {
                 const groupDuration = iconType === 'paperclip' || iconType === 'sliders' ? 0.8 : 0.45;
                 gsap.to(Array.from(svgElements), {
@@ -146,6 +248,20 @@ export const Section: React.FC<SectionProps> = ({
             }
           }
         });
+        
+        // Refresh ScrollTrigger after resources load
+        const refreshScrollTrigger = () => {
+          requestAnimationFrame(() => {
+            scrollTrigger?.refresh();
+          });
+        };
+        
+        if (document.readyState === 'complete') {
+          refreshScrollTrigger();
+        } else {
+          window.addEventListener('load', refreshScrollTrigger);
+          loadListeners.push(() => window.removeEventListener('load', refreshScrollTrigger));
+        }
         
         // Default hover animations for each icon type
         const svg = iconRef.current.querySelector('svg');
@@ -260,6 +376,7 @@ export const Section: React.FC<SectionProps> = ({
     return () => {
       ctx.revert();
       window.removeEventListener('resize', updateLineWidth);
+      loadListeners.forEach(cleanup => cleanup());
     };
   }, []);
 

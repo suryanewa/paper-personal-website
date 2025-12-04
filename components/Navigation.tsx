@@ -95,29 +95,75 @@ export const Navigation: React.FC = () => {
     if (!pathRef.current) return;
 
     const path = pathRef.current;
-    const length = path.getTotalLength();
+    let ctx: gsap.Context | null = null;
+    const loadListeners: (() => void)[] = [];
     
-    // Set initial state
-    gsap.set(path, { 
-      strokeDasharray: length, 
-      strokeDashoffset: length 
-    });
+    const refreshProgressBar = () => {
+      requestAnimationFrame(() => {
+        ScrollTrigger.refresh();
+      });
+    };
+    
+    const initProgressBar = () => {
+      if (!pathRef.current || ctx) return; // Only initialize once
+      
+      requestAnimationFrame(() => {
+        if (!pathRef.current) return;
+        
+        const length = pathRef.current.getTotalLength();
+        
+        // Set initial state
+        gsap.set(pathRef.current, { 
+          strokeDasharray: length, 
+          strokeDashoffset: length 
+        });
 
-    // Animate based on scroll progress through the entire page
-    const ctx = gsap.context(() => {
-      gsap.to(path, {
-        strokeDashoffset: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: document.body,
-          start: "top top",
-          end: "bottom bottom",
-          scrub: 1, // Smooth scrubbing with 1 second lag
+        // Animate based on scroll progress through the entire page
+        ctx = gsap.context(() => {
+          gsap.to(pathRef.current, {
+            strokeDashoffset: 0,
+            ease: "none",
+            scrollTrigger: {
+              trigger: document.body,
+              start: "top top",
+              end: "bottom bottom",
+              scrub: 1, // Smooth scrubbing with 1 second lag
+            }
+          });
+        }, navRef);
+      });
+    };
+    
+    const refreshProgressBarAfterLoad = () => {
+      requestAnimationFrame(() => {
+        if (pathRef.current && ctx) {
+          // Recalculate length after fonts load
+          const length = pathRef.current.getTotalLength();
+          gsap.set(pathRef.current, { 
+            strokeDasharray: length, 
+            strokeDashoffset: length 
+          });
+          ScrollTrigger.refresh();
         }
       });
-    }, navRef);
+    };
+    
+    initProgressBar();
+    
+    // Refresh after fonts/resources load (but don't reinitialize)
+    if (document.readyState === 'complete') {
+      refreshProgressBarAfterLoad();
+    } else {
+      window.addEventListener('load', refreshProgressBarAfterLoad);
+      loadListeners.push(() => window.removeEventListener('load', refreshProgressBarAfterLoad));
+    }
 
-    return () => ctx.revert();
+    return () => {
+      if (ctx) {
+        ctx.revert();
+      }
+      loadListeners.forEach(cleanup => cleanup());
+    };
   }, []);
 
   const scrollToSection = (id: string) => {
