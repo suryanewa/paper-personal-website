@@ -179,18 +179,29 @@ export const Navigation: React.FC = () => {
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           const element = document.getElementById(id);
-          if (element) {
-            // Get the saved scroll position and calculate offset
-            const savedScrollY = scrollYRef.current;
-            const elementTop = element.getBoundingClientRect().top + savedScrollY;
-            window.scrollTo({ top: elementTop, behavior: 'smooth' });
+          const nav = navRef.current;
+          if (element && nav) {
+            // Calculate navigation height including progress bar
+            const navHeight = nav.offsetHeight;
+            // Get element's position relative to document
+            const elementRect = element.getBoundingClientRect();
+            const elementTop = elementRect.top + window.scrollY;
+            // Subtract navigation height so section title appears just below it
+            const scrollPosition = elementTop - navHeight;
+            window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
           }
         });
       });
     } else {
       const element = document.getElementById(id);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth' });
+      const nav = navRef.current;
+      if (element && nav) {
+        // Calculate navigation height for desktop scroll too
+        const navHeight = nav.offsetHeight;
+        const elementRect = element.getBoundingClientRect();
+        const elementTop = elementRect.top + window.scrollY;
+        const scrollPosition = elementTop - navHeight;
+        window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
       }
     }
   };
