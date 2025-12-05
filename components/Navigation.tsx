@@ -186,8 +186,8 @@ export const Navigation: React.FC = () => {
             // Get element's position relative to document
             const elementRect = element.getBoundingClientRect();
             const elementTop = elementRect.top + window.scrollY;
-            // Subtract navigation height plus small additional offset for better spacing
-            const scrollPosition = elementTop - navHeight - 30;
+            // Subtract navigation height so section title appears just below it
+            const scrollPosition = elementTop - navHeight;
             window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
           }
         });
@@ -200,8 +200,7 @@ export const Navigation: React.FC = () => {
         const navHeight = nav.offsetHeight;
         const elementRect = element.getBoundingClientRect();
         const elementTop = elementRect.top + window.scrollY;
-        // Subtract navigation height plus small additional offset for better spacing
-        const scrollPosition = elementTop - navHeight - 30;
+        const scrollPosition = elementTop - navHeight;
         window.scrollTo({ top: Math.max(0, scrollPosition), behavior: 'smooth' });
       }
     }
