@@ -17,7 +17,18 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
+        },
+        conditions: ['browser', 'import', 'module', 'default']
+      },
+      build: {
+        rollupOptions: {
+          output: {
+            manualChunks: undefined
+          }
         }
+      },
+      optimizeDeps: {
+        include: ['@vercel/analytics/react']
       }
     };
 });
