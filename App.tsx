@@ -1,5 +1,4 @@
 import React from 'react';
-import { Analytics } from '@vercel/analytics/react';
 import { Hero } from './components/Hero';
 import { Education } from './components/Education';
 import { Experience } from './components/Experience';
@@ -11,6 +10,7 @@ import { Footer } from './components/Footer';
 import { CustomCursor } from './components/CustomCursor';
 import { Navigation } from './components/Navigation';
 import { FloatingPrintButton } from './components/FloatingPrintButton';
+import { AnalyticsClient } from './components/AnalyticsClient';
 
 const App: React.FC = () => {
   return (
@@ -32,7 +32,7 @@ const App: React.FC = () => {
       </main>
       
       <Footer />
-      <Analytics />
+      <AnalyticsClient />
     </div>
   );
 };
