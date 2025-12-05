@@ -20,6 +20,7 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
+          '@vercel/analytics': path.resolve(__dirname, 'node_modules/@vercel/analytics/dist/index.mjs'),
         },
         conditions: ['browser', 'import', 'module', 'default']
       },
