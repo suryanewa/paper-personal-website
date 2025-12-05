@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
-          '@vercel/analytics/react': path.resolve(__dirname, 'node_modules/@vercel/analytics/dist/react/index.mjs'),
+          '@vercel/analytics/react': path.resolve(__dirname, 'node_modules/@vercel/analytics/dist/react/index.js'),
         },
         conditions: ['browser', 'import', 'module', 'default']
       },
