@@ -1,29 +1,21 @@
 import { useEffect } from 'react';
 
-// Minimal client-side Analytics initialization that avoids subpath resolution issues
-// in certain build environments (e.g., Vercel with Vite/ESM).
+// Load Vercel Analytics via script tag to avoid build-time package resolution issues
 export const AnalyticsClient: React.FC = () => {
   useEffect(() => {
-    let cancelled = false;
-    // Dynamically import the base package (not the /react subpath) to avoid Rollup resolution errors.
-    import('@vercel/analytics')
-      .then((mod) => {
-        if (cancelled) return;
-        // Prefer the React Analytics component if available; otherwise, inject directly.
-        if (mod.inject) {
-          mod.inject();
-        }
-        // If a track function exists, trigger an initial pageview to align with the React helper.
-        if (mod.track) {
-          mod.track('pageview');
-        }
-      })
-      .catch(() => {
-        // Swallow errors silently; analytics is non-critical.
-      });
+    // Only load in production and on vercel.app or custom domains
+    if (typeof window === 'undefined') return;
+    
+    // Check if already loaded
+    if (document.querySelector('script[src*="va.vercel-scripts.com"]')) return;
+
+    const script = document.createElement('script');
+    script.src = '/_vercel/insights/script.js';
+    script.defer = true;
+    document.head.appendChild(script);
 
     return () => {
-      cancelled = true;
+      // Cleanup not needed - script should persist
     };
   }, []);
 
