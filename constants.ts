@@ -117,7 +117,7 @@ export const RESUME_DATA: ResumeData = {
       tech: ["Developer Tools", "Code Intelligence", "Interactive Web"],
       logo: "/assets/logos/Every Repo Logo.svg",
       description: [
-        "Mapping and visualizing the software ecosystem at scale, inspired by GitHub Next’s speculative tooling and Glenn McDonald’s Every Noise at Once system of musical embeddings.",
+        "Mapping and visualizing the software ecosystem at scale, inspired by GitHub Next's speculative tooling and Glenn McDonald's Every Noise at Once system of musical embeddings.",
         "Exploring new ways developers can understand, navigate, and compare repositories using large-scale embeddings, graph visualizations, and interactive exploration."
       ],
       link: "https://everyrepo.com"
@@ -134,6 +134,32 @@ export const RESUME_DATA: ResumeData = {
         "Conducting interviews and online forum analysis to define MVP scope and identify key adoption drivers for early product-market fit."
       ],
       link: "https://joinlifeos.com"
+    },
+    {
+      id: "proj6",
+      title: "QuickTake - AI Answer Engine",
+      role: "Creator",
+      period: "2025",
+      tech: ["AI", "Search", "Knowledge Retrieval"],
+      logo: "/assets/logos/QuickTake Logo.svg",
+      description: [
+        "Built an AI-powered how-to and what-is answer engine that summarizes the best short-form videos into clear, trustworthy instruction cards.",
+        "Prototyping ranking, embedding, and snippet-generation pipelines to identify high-quality clips and surface structured answers that reduce user friction in discovery."
+      ],
+      link: "http://quicktake.live"
+    },
+    {
+      id: "proj7",
+      title: "PawCare - Pet Health Monitoring",
+      role: "Developer",
+      period: "2025",
+      tech: ["Hardware", "Health Monitoring", "Veterinary Tech"],
+      logo: "/assets/logos/Pawcare Logo.svg",
+      description: [
+        "Developed a wearable collar device concept and clinic dashboard that track continuous pet health signals to surface early indicators of illness often missed during periodic vet visits.",
+        "Conducted interviews with veterinarians and technicians to refine feature scope, validate pricing, and identify workflow gaps where continuous monitoring drives measurable clinical value."
+      ],
+      link: "https://pawcarehealth.vercel.app"
     },
     {
       id: "proj5",
