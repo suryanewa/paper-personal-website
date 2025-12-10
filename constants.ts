@@ -222,6 +222,16 @@ export const RESUME_DATA: ResumeData = {
   ],
   publications: [
     {
+      id: "pub4",
+      title: "The Messy Middle Between Prototype and Product",
+      publisher: "Substack",
+      date: "Dec 2025",
+      link: "https://suryanewa.substack.com/p/the-messy-middle",
+      description: [
+        "How user behavior (not features) determines what your product becomes"
+      ]
+    },
+    {
       id: "pub3",
       title: "The Screenshot Black Hole",
       publisher: "Substack",

@@ -65,12 +65,12 @@ export const Publications: React.FC = () => {
                           href={item.link} 
                           target="_blank" 
                           rel="noreferrer" 
-                          className="clickable flex items-center gap-2 text-ink-800 transition-colors"
+                          className="flex items-center gap-2 text-ink-800 transition-colors"
                         >
-                          <span className="text-sm font-sans font-bold tracking-wider uppercase">
+                          <span className="clickable text-sm font-sans font-bold tracking-wider uppercase">
                             {item.publisher}
                           </span>
-                          <ExternalLink size={16} />
+                          <ExternalLink size={16} className="clickable" />
                         </a>
                         {/* Mobile: Date next to platform */}
                         <span className="md:hidden">
